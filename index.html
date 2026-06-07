@@ -65,7 +65,7 @@
     Завершено 2 из 21 точки.
   </p>
   <div class="progress-bar"><div class="progress-fill" style="width:10%">2/21</div></div>
-  <p class="toc">retry_delay: <a href="#rd-500">500</a> &nbsp;·&nbsp; <a href="#rd-600">600</a> &nbsp;·&nbsp; <a href="#analysis">→ анализ</a></p>
+  <p class="toc">retry_delay: <a href="#rd-500">500</a> &nbsp;·&nbsp; <a href="#rd-600">600</a> &nbsp;·&nbsp; <a href="#rssi">RSSI</a> &nbsp;·&nbsp; <a href="#analysis">→ анализ</a></p>
 
   <div class="panel">
     <h3 style="margin-top:0;">Параметры серии</h3>
@@ -88,6 +88,20 @@
       <li><b>(b)</b> <code>median(records_per_minute) &lt; 17.0</code></li>
     </ul>
   </div>
+
+  
+    <h2 id="rssi">Мощность BLE-сигнала (RSSI) — периодический замер</h2>
+    <div class="panel">
+      <p style="margin-top:0;" class="note">Среднее за 60 с, замер каждые 3 часа во время sweep'а.</p>
+      <table>
+        <thead><tr>
+          <th>Дата</th><th>Время</th><th>avg, дБм</th><th>min</th><th>max</th><th>n samples</th>
+        </tr></thead>
+        <tbody><tr><td>07-06-2026</td><td>11:22</td><td><b>-87.0</b></td><td>-89</td><td>-84</td><td>24</td></tr></tbody>
+      </table>
+      <p class="note">Рабочий диапазон BLE: −50 (вплотную) .. −90 (граница потерь). Drift &gt;3 дБ = вероятно физическое смещение.</p>
+    </div>
+    
 
   
     <h2 id="rd-500">retry_delay = 500 ms
@@ -190,7 +204,7 @@
 
   <div class="footer">
     AtomFast retry_delay production sweep — 2/21 points.
-    Обновлено 07-06-2026 07:53 UTC.
+    Обновлено 07-06-2026 08:24 UTC.
   </div>
 
 </div>
