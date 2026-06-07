@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AtomFast retry_delay sweep — production (5/21)</title>
+<title>AtomFast retry_delay sweep — production (6/21)</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
@@ -62,10 +62,10 @@
   <h1>AtomFast — retry_delay sweep (production)</h1>
   <p class="subtitle">
     Production-серия 500–2500 мс × 10 итераций × 10–20 мин мониторинга.
-    Завершено 5 из 21 точки.
+    Завершено 6 из 21 точки.
   </p>
-  <div class="progress-bar"><div class="progress-fill" style="width:24%">5/21</div></div>
-  <p class="toc">retry_delay: <a href="#rd-500">500</a> &nbsp;·&nbsp; <a href="#rd-600">600</a> &nbsp;·&nbsp; <a href="#rd-700">700</a> &nbsp;·&nbsp; <a href="#rd-800">800</a> &nbsp;·&nbsp; <a href="#rd-900">900</a> &nbsp;·&nbsp; <a href="#rssi">RSSI</a> &nbsp;·&nbsp; <a href="#analysis">→ анализ</a></p>
+  <div class="progress-bar"><div class="progress-fill" style="width:29%">6/21</div></div>
+  <p class="toc">retry_delay: <a href="#rd-500">500</a> &nbsp;·&nbsp; <a href="#rd-600">600</a> &nbsp;·&nbsp; <a href="#rd-700">700</a> &nbsp;·&nbsp; <a href="#rd-800">800</a> &nbsp;·&nbsp; <a href="#rd-900">900</a> &nbsp;·&nbsp; <a href="#rd-1000">1000</a> &nbsp;·&nbsp; <a href="#rssi">RSSI</a> &nbsp;·&nbsp; <a href="#analysis">→ анализ</a></p>
 
   <div class="panel">
     <h3 style="margin-top:0;">Параметры серии</h3>
@@ -97,7 +97,7 @@
         <thead><tr>
           <th>Дата</th><th>Время</th><th>avg, дБм</th><th>min</th><th>max</th><th>n samples</th>
         </tr></thead>
-        <tbody><tr><td>07-06-2026</td><td>11:22</td><td><b>-87.0</b></td><td>-89</td><td>-84</td><td>24</td></tr></tbody>
+        <tbody><tr><td>07-06-2026</td><td>11:22</td><td><b>-87.0</b></td><td>-89</td><td>-84</td><td>24</td></tr><tr><td>07-06-2026</td><td>18:08</td><td><b>-92.0</b></td><td>-96</td><td>-88</td><td>31</td></tr></tbody>
       </table>
       <p class="note">Рабочий диапазон BLE: −50 (вплотную) .. −90 (граница потерь). Drift &gt;3 дБ = вероятно физическое смещение.</p>
     </div>
@@ -299,6 +299,45 @@
       
     </div>
     
+    <h2 id="rd-1000">retry_delay = 1000 ms
+      <span class="badge badge-bad">UNSTABLE</span>
+    </h2>
+    <div class="panel">
+      <div class="excel-label">retry_delay = 1000</div>
+      <div class="excel-wrap">
+        <table class="excel">
+          
+      <thead>
+        <tr>
+          <th rowspan="2">Итерация</th>
+          <th rowspan="2">Дата</th>
+          <th rowspan="2">Время</th>
+          <th>Время итер.</th>
+          <th>Таймаут</th>
+          <th>Плановых<br>подкл.</th>
+          <th>Внезапных<br>откл.</th>
+          <th>Плановых<br>откл.</th>
+          <th>k / N</th>
+          <th>%</th>
+        </tr>
+        <tr class="th-sub">
+          <th>мин</th><th>с</th>
+          <th></th><th></th><th></th><th></th><th></th>
+        </tr>
+      </thead>
+    
+          <tbody><tr><td>1</td><td class="ts">07-06-2026</td><td class="ts">16:25</td><td>16.5</td><td>7</td><td>5</td><td>4</td><td>1</td><td>1/10</td><td>10.00</td></tr><tr><td>2</td><td class="ts">07-06-2026</td><td class="ts">16:41</td><td>17.2</td><td>7</td><td>5</td><td>4</td><td>1</td><td>2/10</td><td>20.00</td></tr><tr><td>3</td><td class="ts">07-06-2026</td><td class="ts">16:59</td><td>13.8</td><td>8</td><td>5</td><td>4</td><td>1</td><td>3/10</td><td>30.00</td></tr><tr><td>4</td><td class="ts">07-06-2026</td><td class="ts">17:13</td><td>15.4</td><td>10</td><td>7</td><td>6</td><td>1</td><td>4/10</td><td>40.00</td></tr><tr><td>5</td><td class="ts">07-06-2026</td><td class="ts">17:28</td><td>16.9</td><td>6</td><td>17</td><td>17</td><td>1</td><td>5/10</td><td>50.00</td></tr><tr><td>6</td><td class="ts">07-06-2026</td><td class="ts">17:45</td><td>13.0</td><td>8</td><td>17</td><td>16</td><td>1</td><td>6/10</td><td>60.00</td></tr><tr><td>7</td><td class="ts">07-06-2026</td><td class="ts">17:58</td><td>16.1</td><td>7</td><td>18</td><td>17</td><td>1</td><td>7/10</td><td>70.00</td></tr><tr><td>8</td><td class="ts">07-06-2026</td><td class="ts">18:15</td><td>17.8</td><td>9</td><td>16</td><td>15</td><td>1</td><td>8/10</td><td>80.00</td></tr><tr><td>9</td><td class="ts">07-06-2026</td><td class="ts">18:33</td><td>17.1</td><td>7</td><td>19</td><td>18</td><td>1</td><td>9/10</td><td>90.00</td></tr><tr><td>10</td><td class="ts">07-06-2026</td><td class="ts">18:50</td><td>17.0</td><td></td><td>33</td><td>32</td><td>1</td><td>10/10</td><td>100.00</td></tr></tbody>
+        </table>
+      </div>
+      <dl class="stat-grid">
+        <dt>latency med / min / max, ms</dt><dd>8456 / 3727 / 34289</dd>
+        <dt>rec/min med / min</dt><dd>27.98 / 22.84</dd>
+        <dt>iter с sudden ≥ 1</dt><dd>10 / 10</dd>
+        <dt>dirty stops</dt><dd>1 / 10</dd>
+      </dl>
+      
+    </div>
+    
 
   <h2 id="analysis">Анализ серии</h2>
   <h3>Сводная таблица</h3>
@@ -312,7 +351,8 @@
 <tr><td>600</td><td>4970</td><td>3752</td><td>19358</td><td>29.92</td><td>29.33</td><td>4 / 10</td><td>0 / 10</td><td class="verdict-bad">UNSTABLE</td></tr>
 <tr><td>700</td><td>6206</td><td>3697</td><td>14369</td><td>29.5</td><td>28.26</td><td>9 / 10</td><td>0 / 10</td><td class="verdict-bad">UNSTABLE</td></tr>
 <tr><td>800</td><td>8583</td><td>3717</td><td>31022</td><td>27.97</td><td>0.0</td><td>10 / 10</td><td>1 / 10</td><td class="verdict-bad">UNSTABLE</td></tr>
-<tr><td>900</td><td>12152</td><td>3670</td><td>26165</td><td>29.11</td><td>0.0</td><td>10 / 10</td><td>1 / 10</td><td class="verdict-bad">UNSTABLE</td></tr></tbody>
+<tr><td>900</td><td>12152</td><td>3670</td><td>26165</td><td>29.11</td><td>0.0</td><td>10 / 10</td><td>1 / 10</td><td class="verdict-bad">UNSTABLE</td></tr>
+<tr><td>1000</td><td>8456</td><td>3727</td><td>34289</td><td>27.98</td><td>22.84</td><td>10 / 10</td><td>1 / 10</td><td class="verdict-bad">UNSTABLE</td></tr></tbody>
     </table>
   </div>
 
@@ -323,15 +363,15 @@
   <div class="chart-wrap"><canvas id="latChart"></canvas></div>
 
   <div class="footer">
-    AtomFast retry_delay production sweep — 5/21 points.
-    Обновлено 07-06-2026 16:25 UTC.
+    AtomFast retry_delay production sweep — 6/21 points.
+    Обновлено 07-06-2026 19:07 UTC.
   </div>
 
 </div>
 <script>
-const RD = [500, 600, 700, 800, 900];
-const RPM = {"500": [29.61, 29.16, 29.64, 29.44, 29.24, 29.56, 29.5, 30.15, 29.69, 29.94], "600": [29.57, 30.04, 29.37, 29.65, 30.13, 29.33, 29.95, 30.09, 29.96, 29.9], "700": [29.79, 29.12, 28.26, 29.46, 29.45, 29.77, 29.54, 29.73, 29.77, 29.03], "800": [29.23, 27.24, 25.83, 26.7, 0.0, 27.87, 28.6, 29.39, 28.07, 29.22], "900": [25.65, 0.0, 29.34, 29.34, 29.3, 28.01, 28.36, 30.16, 29.74, 28.91]};
-const LAT = {"500": [4949, 5091, 4994, 13471, 9821, 3810, 4928, 4978, 3793, 5106], "600": [19358, 3752, 6268, 13486, 3770, 3829, 4979, 4961, 3777, 8584], "700": [7488, 8522, 3706, 4844, 14369, 4874, 8417, 4923, 3697, 14283], "800": [31022, 3717, 8419, 6207, 16729, 13294, 4915, 14249, 8583], "900": [26165, 17791, 16615, 3670, 12152, 4940, 3732, 16742, 4979]};
+const RD = [500, 600, 700, 800, 900, 1000];
+const RPM = {"500": [29.61, 29.16, 29.64, 29.44, 29.24, 29.56, 29.5, 30.15, 29.69, 29.94], "600": [29.57, 30.04, 29.37, 29.65, 30.13, 29.33, 29.95, 30.09, 29.96, 29.9], "700": [29.79, 29.12, 28.26, 29.46, 29.45, 29.77, 29.54, 29.73, 29.77, 29.03], "800": [29.23, 27.24, 25.83, 26.7, 0.0, 27.87, 28.6, 29.39, 28.07, 29.22], "900": [25.65, 0.0, 29.34, 29.34, 29.3, 28.01, 28.36, 30.16, 29.74, 28.91], "1000": [29.03, 29.79, 29.04, 29.56, 28.05, 25.46, 26.29, 27.91, 26.84, 22.84]};
+const LAT = {"500": [4949, 5091, 4994, 13471, 9821, 3810, 4928, 4978, 3793, 5106], "600": [19358, 3752, 6268, 13486, 3770, 3829, 4979, 4961, 3777, 8584], "700": [7488, 8522, 3706, 4844, 14369, 4874, 8417, 4923, 3697, 14283], "800": [31022, 3717, 8419, 6207, 16729, 13294, 4915, 14249, 8583], "900": [26165, 17791, 16615, 3670, 12152, 4940, 3732, 16742, 4979], "1000": [13224, 9588, 16846, 7323, 3727, 34289, 6039, 3748, 27390, 6104]};
 function median(a){ const s=[...a].sort((a,b)=>a-b),m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
 function scatter(d){ const o=[]; for(const rd of RD) for(const v of d[String(rd)]) o.push({x:rd,y:v}); return o; }
 function mline(d){ return RD.map(rd=>({x:rd,y:median(d[String(rd)])})); }
@@ -345,7 +385,7 @@ new Chart(document.getElementById('rpmChart'),{
   ]},
   options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{labels:{color:'#d4dbe2'}}, tooltip:{callbacks:{label:c=>`rd=${c.parsed.x}, rpm=${c.parsed.y.toFixed(2)}`}} },
-    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:950,ticks:{...t,stepSize:100},grid:g},
+    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
       y:{title:{display:true,text:'rec/min',color:'#d4dbe2'},min:0,max:32,ticks:t,grid:g} }
   }
 });
@@ -356,8 +396,8 @@ new Chart(document.getElementById('latChart'),{
   ]},
   options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{labels:{color:'#d4dbe2'}}, tooltip:{callbacks:{label:c=>`rd=${c.parsed.x}, lat=${c.parsed.y}ms`}} },
-    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:950,ticks:{...t,stepSize:100},grid:g},
-      y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,max:35675,ticks:t,grid:g} }
+    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
+      y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,max:39432,ticks:t,grid:g} }
   }
 });
 </script>
