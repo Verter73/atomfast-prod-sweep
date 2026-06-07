@@ -365,16 +365,16 @@
   <h3>Подключения vs. откл. по итерациям</h3>
   <div class="panel" style="padding-bottom:10px;">
     <p style="margin-top:0;font-size:12px;color:var(--muted);">
-      Каждая точка — одна итерация. <b>X</b> = sudden_disconnects + planned_disconnects.
-      <b>Y</b> = число подключений (<code>connection_established</code> событий).
-      Цвет = retry_delay. В идеале Y = X&nbsp;(каждый разрыв → реконнект; последнее плановое откл. без реконнекта).
+      Каждая точка — одно rd-значение (среднее за 10 итераций).
+      <b>X</b> = avg(sudden + planned disconnects). <b>Y</b> = avg(connections).
+      Подпись = retry_delay мс. Пунктир y = x: идеальный случай (реконнект после каждого разрыва).
     </p>
   </div>
   <div class="chart-wrap" style="height:440px"><canvas id="connDiscChart"></canvas></div>
 
   <div class="footer">
     AtomFast retry_delay production sweep — 6/21 points.
-    Обновлено 07-06-2026 19:53 UTC.
+    Обновлено 07-06-2026 19:54 UTC.
   </div>
 
 </div>
@@ -410,42 +410,60 @@ new Chart(document.getElementById('latChart'),{
       y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,max:39432,ticks:t,grid:g} }
   }
 });
-const CONN_DISC = {"500": [{"x": 3, "y": 3}, {"x": 5, "y": 5}, {"x": 2, "y": 2}, {"x": 1, "y": 1}, {"x": 2, "y": 2}, {"x": 2, "y": 2}, {"x": 2, "y": 2}, {"x": 1, "y": 1}, {"x": 3, "y": 3}, {"x": 2, "y": 2}], "600": [{"x": 1, "y": 1}, {"x": 2, "y": 2}, {"x": 3, "y": 3}, {"x": 2, "y": 2}, {"x": 1, "y": 1}, {"x": 2, "y": 2}, {"x": 1, "y": 1}, {"x": 1, "y": 1}, {"x": 1, "y": 1}, {"x": 1, "y": 1}], "700": [{"x": 1, "y": 1}, {"x": 6, "y": 6}, {"x": 16, "y": 16}, {"x": 2, "y": 2}, {"x": 4, "y": 4}, {"x": 3, "y": 3}, {"x": 2, "y": 2}, {"x": 2, "y": 2}, {"x": 3, "y": 3}, {"x": 5, "y": 4}], "800": [{"x": 5, "y": 5}, {"x": 12, "y": 12}, {"x": 22, "y": 22}, {"x": 20, "y": 20}, {"x": 2, "y": 0}, {"x": 10, "y": 10}, {"x": 9, "y": 9}, {"x": 9, "y": 9}, {"x": 4, "y": 3}, {"x": 6, "y": 6}], "900": [{"x": 11, "y": 11}, {"x": 2, "y": 0}, {"x": 3, "y": 3}, {"x": 3, "y": 3}, {"x": 7, "y": 7}, {"x": 6, "y": 6}, {"x": 9, "y": 9}, {"x": 4, "y": 4}, {"x": 4, "y": 4}, {"x": 4, "y": 4}], "1000": [{"x": 5, "y": 5}, {"x": 5, "y": 5}, {"x": 5, "y": 5}, {"x": 7, "y": 7}, {"x": 18, "y": 17}, {"x": 17, "y": 17}, {"x": 18, "y": 18}, {"x": 16, "y": 16}, {"x": 19, "y": 19}, {"x": 33, "y": 33}]};
+const CONN_DISC_AVG = [{"rd": 500, "x": 2.3, "y": 2.3}, {"rd": 600, "x": 1.5, "y": 1.5}, {"rd": 700, "x": 4.4, "y": 4.3}, {"rd": 800, "x": 9.9, "y": 9.6}, {"rd": 900, "x": 5.3, "y": 5.1}, {"rd": 1000, "x": 14.3, "y": 14.2}];
 (function(){
-  const n = RD.length;
-  const pal = (i,a) => `hsla(${(i*360/n)|0},72%,58%,${a})`;
-  const datasets = RD.map((rd,i) => ({
-    label: rd+'ms',
-    data: CONN_DISC[String(rd)],
-    backgroundColor: pal(i,0.65),
-    borderColor: pal(i,1),
-    pointRadius: 6,
-    pointHoverRadius: 8,
-  }));
-  // diagonal reference: y = x (each disconnect → reconnect; but last planned has no reconnect)
-  const maxDisc = Math.max(...Object.values(CONN_DISC).flat().map(p=>p.x), 2);
-  datasets.push({
-    type:'line', label:'y = x (ref)',
-    data: [{x:0,y:0},{x:maxDisc+1,y:maxDisc+1}],
-    borderColor:'rgba(138,160,184,0.35)', borderDash:[5,4], borderWidth:1.5,
-    pointRadius:0, fill:false,
-  });
+  const maxDisc = Math.max(...CONN_DISC_AVG.map(p=>p.x), 2);
+  const maxConn = Math.max(...CONN_DISC_AVG.map(p=>p.y), 2);
+  const axMax   = Math.max(maxDisc, maxConn) + 1;
   new Chart(document.getElementById('connDiscChart'),{
     type:'scatter',
-    data:{ datasets },
+    data:{ datasets:[
+      {
+        label:'avg per rd',
+        data: CONN_DISC_AVG.map(p=>({x:p.x, y:p.y, rd:p.rd})),
+        backgroundColor:'rgba(78,168,222,0.75)',
+        borderColor:'#4ea8de',
+        pointRadius:7,
+        pointHoverRadius:9,
+      },
+      {
+        type:'line', label:'y = x (ref)',
+        data:[{x:0,y:0},{x:axMax,y:axMax}],
+        borderColor:'rgba(138,160,184,0.3)', borderDash:[5,4],
+        borderWidth:1.5, pointRadius:0, fill:false,
+      },
+    ]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{
-        legend:{labels:{color:'#d4dbe2',boxWidth:12,font:{size:10}}},
-        tooltip:{callbacks:{label:c=>c.dataset.label==='y = x (ref)' ? null :
-          `rd=${c.dataset.label}: откл=${c.parsed.x}, подкл=${c.parsed.y}`}}
+        legend:{labels:{color:'#d4dbe2',boxWidth:12}},
+        tooltip:{callbacks:{
+          label: c => c.dataset.label==='y = x (ref)' ? null :
+            `rd=${c.raw.rd}ms: avg откл=${c.parsed.x}, avg подкл=${c.parsed.y}`
+        }},
+        afterDatasetDraw: undefined,
       },
       scales:{
-        x:{type:'linear',title:{display:true,text:'Откл. total (sudden + planned)',color:'#d4dbe2'},
-           min:0,ticks:{...t,stepSize:1},grid:g},
-        y:{title:{display:true,text:'Число подключений',color:'#d4dbe2'},
-           min:0,ticks:{...t,stepSize:1},grid:g}
+        x:{type:'linear',title:{display:true,text:'Среднее откл. (sudden + planned)',color:'#d4dbe2'},
+           min:0,max:axMax,ticks:{...t,stepSize:1},grid:g},
+        y:{title:{display:true,text:'Среднее подключений',color:'#d4dbe2'},
+           min:0,max:axMax,ticks:{...t,stepSize:1},grid:g}
       }
-    }
+    },
+    plugins:[{
+      id:'rdLabels',
+      afterDatasetsDraw(chart){
+        const {ctx}=chart; ctx.save();
+        ctx.font='bold 11px Consolas,monospace'; ctx.fillStyle='#d4dbe2'; ctx.textAlign='left';
+        const ds=chart.data.datasets[0];
+        ds.data.forEach((pt,i)=>{
+          const meta=chart.getDatasetMeta(0);
+          if(!meta.data[i]) return;
+          const {x,y}=meta.data[i].getProps(['x','y'],true);
+          ctx.fillText(pt.rd+'ms', x+8, y+4);
+        });
+        ctx.restore();
+      }
+    }],
   });
 })();
 </script>
