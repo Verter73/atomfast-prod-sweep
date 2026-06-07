@@ -1,1 +1,300 @@
-<html><body><h1>Production sweep — building...</h1></body></html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AtomFast production sweep &mdash; rd=500 ms (1/21)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #151b23;
+    --border: #2a3340;
+    --text: #d4dbe2;
+    --muted: #8aa0b8;
+    --accent: #4ea8de;
+    --stable: #43c267;
+    --warn:   #e0b341;
+    --bad:    #e2624c;
+    --mono: 'Consolas', 'Cascadia Mono', 'SF Mono', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-weight: 600; font-size: 24px; margin: 0 0 8px; color: #fff; }
+  h2 { font-weight: 600; font-size: 17px; margin: 32px 0 12px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-weight: 600; font-size: 14px; margin: 16px 0 8px; color: var(--muted); }
+  .subtitle { color: var(--muted); margin: 0 0 16px; font-size: 13px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+  }
+  .meta-grid, .stat-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 18px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .meta-grid dt, .stat-grid dt { color: var(--muted); }
+  .meta-grid dd, .stat-grid dd { margin: 0; }
+  .stat-grid { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  th, td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; background: #1a2230; }
+  tr:hover td { background: #1a232f; }
+  .excel-wrap { overflow-x: auto; }
+  table.excel th, table.excel td {
+    border: 1px solid var(--border);
+    text-align: center;
+    padding: 6px 8px;
+    font-size: 12.5px;
+  }
+  table.excel th:first-child, table.excel td:first-child { text-align: center; }
+  table.excel td.ts { font-size: 11.5px; text-align: left; white-space: nowrap; }
+  table.excel .th-sub th { color: var(--muted); font-weight: 400; font-size: 11px; background: #131922; }
+  .verdict-stable { color: var(--stable); font-weight: 600; }
+  .verdict-bad    { color: var(--bad);    font-weight: 600; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 12px; font-style: italic; }
+  code { font-family: var(--mono); background: #1a2230; padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
+  .chart-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; margin-bottom: 22px; height: 380px; }
+  .footer { color: var(--muted); font-size: 12px; margin-top: 40px; text-align: center; border-top: 1px solid var(--border); padding-top: 18px; }
+  ul.compact { margin: 6px 0 0 0; padding-left: 20px; }
+  ul.compact li { margin-bottom: 4px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; font-family: var(--mono); margin-left: 8px; vertical-align: middle; }
+  .badge-stable { background: rgba(67, 194, 103, 0.15); color: var(--stable); }
+  .badge-bad    { background: rgba(226, 98, 76, 0.15); color: var(--bad); }
+  td.bad { color: var(--bad); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>AtomFast &mdash; production sweep</h1>
+  <p class="subtitle">
+    Production retry_delay sweep. Point rd=500 ms, 10 iterations.
+    Progress: 1 / 21 points completed.
+  </p>
+
+  <div class="panel">
+    <h3 style="margin-top: 0;">Series parameters</h3>
+    <dl class="meta-grid">
+      <dt>retry_delay</dt><dd>500 ms</dd>
+      <dt>iterations per point</dt><dd>10</dd>
+      <dt>monitor window</dt><dd>random 10-20 min per iteration</dd>
+      <dt>BLE packet</dt><dd>28 bytes every ~2.4 s (nominal ~25 rec/min)</dd>
+      <dt>dosimeter</dt><dd>AtomFast</dd>
+      <dt>app build</dt><dd>com.youratom.scid.atftest (test-flavor w/ SET_RETRY_DELAY broadcast)</dd>
+      <dt>method</dt><dd>PC-side adb observation of arch_* file growth in /data/data/&lt;app&gt;/files</dd>
+      <dt>run date</dt><dd>2026-06-07 (UTC)</dd>
+    </dl>
+  </div>
+
+  <h2>Stability rule</h2>
+  <div class="panel">
+    <p style="margin-top:0;">A retry_delay point is <span class="badge badge-bad">UNSTABLE</span> if either:</p>
+    <ul class="compact">
+      <li><b>(a)</b> <code>sum(sudden_disconnect_count) &ge; 2</code> across all iterations</li>
+      <li><b>(b)</b> <code>median(records_per_minute) &lt; 17.0</code></li>
+    </ul>
+  </div>
+
+  
+    <h2 id="rd-500">retry_delay = 500 ms
+      <span class="badge badge-bad">UNSTABLE</span>
+    </h2>
+    <div class="panel">
+      <div class="excel-label">retry_delay = 500 ms &mdash; production sweep (10 iterations)</div>
+      <div class="excel-wrap">
+        <table class="excel">
+          
+      <thead>
+        <tr>
+          <th rowspan="2">Iter</th>
+          <th rowspan="2">timestamp start</th>
+          <th>Duration</th>
+          <th>Cooldown</th>
+          <th>Planned<br>connects</th>
+          <th>Sudden<br>disconnects</th>
+          <th>Planned<br>disconnects</th>
+          <th>Progress<br>k / TOTAL</th>
+          <th>Overall<br>%</th>
+        </tr>
+        <tr class="th-sub">
+          <th>s</th>
+          <th>s</th>
+          <th></th><th></th><th></th><th>k / TOTAL</th><th>%</th>
+        </tr>
+      </thead>
+    
+          <tbody>
+            <tr><td>1</td><td class="ts">2026-06-06T23:23:46.403Z</td><td>1047.3</td><td>5</td><td>3</td><td class="bad">2</td><td>1</td><td>1/10</td><td>10.00</td></tr>
+<tr><td>2</td><td class="ts">2026-06-06T23:41:21.601Z</td><td>707.6</td><td>5</td><td>5</td><td class="bad">4</td><td>1</td><td>2/10</td><td>20.00</td></tr>
+<tr><td>3</td><td class="ts">2026-06-06T23:53:17.051Z</td><td>1177.9</td><td>8</td><td>2</td><td class="bad">1</td><td>1</td><td>3/10</td><td>30.00</td></tr>
+<tr><td>4</td><td class="ts">2026-06-07T00:13:05.841Z</td><td>660.2</td><td>8</td><td>1</td><td>0</td><td>1</td><td>4/10</td><td>40.00</td></tr>
+<tr><td>5</td><td class="ts">2026-06-07T00:24:16.853Z</td><td>806.3</td><td>7</td><td>2</td><td class="bad">1</td><td>1</td><td>5/10</td><td>50.00</td></tr>
+<tr><td>6</td><td class="ts">2026-06-07T00:37:52.938Z</td><td>852.2</td><td>5</td><td>2</td><td class="bad">1</td><td>1</td><td>6/10</td><td>60.00</td></tr>
+<tr><td>7</td><td class="ts">2026-06-07T00:52:12.885Z</td><td>783.0</td><td>6</td><td>2</td><td class="bad">1</td><td>1</td><td>7/10</td><td>70.00</td></tr>
+<tr><td>8</td><td class="ts">2026-06-07T01:05:24.620Z</td><td>984.8</td><td>6</td><td>1</td><td>0</td><td>1</td><td>8/10</td><td>80.00</td></tr>
+<tr><td>9</td><td class="ts">2026-06-07T01:21:58.242Z</td><td>937.4</td><td>7</td><td>3</td><td class="bad">2</td><td>1</td><td>9/10</td><td>90.00</td></tr>
+<tr><td>10</td><td class="ts">2026-06-07T01:37:45.424Z</td><td>727.3</td><td></td><td>2</td><td class="bad">1</td><td>1</td><td>10/10</td><td>100.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <dl class="stat-grid">
+        <dt>latency med / min / max, ms</dt><dd>4986 / 3793 / 13471</dd>
+        <dt>rec/min med / min</dt><dd>29.59 / 29.16</dd>
+        <dt>sudden_disconnect sum</dt><dd>13</dd>
+        <dt>iters with sudden &ge; 1</dt><dd>8 / 10</dd>
+        <dt>dirty planned-disconnect</dt><dd>0 / 10</dd>
+      </dl>
+    </div>
+    
+
+  <h2 id="analysis">Analysis</h2>
+
+  <h3>rec/min per iteration</h3>
+  <div class="chart-wrap">
+    <canvas id="rpmChart"></canvas>
+  </div>
+  <p class="note" style="margin-top:-12px;">
+    Each point is one iteration. Dashed red line = UNSTABLE threshold 17 rec/min. Grey line = nominal BLE 25 rec/min.
+    All iterations well above threshold; throughput is not the problem at rd=500.
+  </p>
+
+  <h3>Sudden disconnects per iteration</h3>
+  <div class="chart-wrap">
+    <canvas id="sdChart"></canvas>
+  </div>
+  <p class="note" style="margin-top:-12px;">
+    8 of 10 iterations had at least one sudden disconnect. Total = 13.
+    rd=500 ms is too aggressive for stable BLE connection with this device/distance.
+  </p>
+
+  <h3>Connect latency per iteration</h3>
+  <div class="chart-wrap">
+    <canvas id="latChart"></canvas>
+  </div>
+
+  <div class="footer">
+    AtomFast production sweep &mdash; rd=500 ms. Generated 2026-06-07.
+    Metric: PC-side adb observation of BLE channel phone &#x2194; dosimeter via <code>arch_*</code> file growth.
+  </div>
+
+</div>
+
+<script>
+const iters = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const RPM = [29.61, 29.16, 29.64, 29.44, 29.24, 29.56, 29.5, 30.15, 29.69, 29.94];
+const LAT = [4949, 5091, 4994, 13471, 9821, 3810, 4928, 4978, 3793, 5106];
+const SD = [2, 4, 1, 0, 1, 1, 1, 0, 2, 1];
+
+const baseGrid = { color: 'rgba(138, 160, 184, 0.12)' };
+const baseTick = { color: '#8aa0b8', font: { family: 'Consolas, monospace', size: 11 } };
+
+new Chart(document.getElementById('rpmChart'), {
+  type: 'bar',
+  data: {
+    labels: iters.map(i => 'iter ' + i),
+    datasets: [
+      {
+        label: 'rec/min',
+        data: RPM,
+        backgroundColor: 'rgba(78, 168, 222, 0.6)',
+        borderColor: '#4ea8de',
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#d4dbe2', font: { size: 12 } } },
+      annotation: undefined,
+    },
+    scales: {
+      x: { ticks: baseTick, grid: baseGrid },
+      y: { title: { display: true, text: 'records per minute', color: '#d4dbe2' },
+            min: 0, max: 35, ticks: baseTick, grid: baseGrid },
+    },
+  },
+});
+
+new Chart(document.getElementById('sdChart'), {
+  type: 'bar',
+  data: {
+    labels: iters.map(i => 'iter ' + i),
+    datasets: [
+      {
+        label: 'sudden disconnects',
+        data: SD,
+        backgroundColor: SD.map(v => v > 0 ? 'rgba(226, 98, 76, 0.6)' : 'rgba(67, 194, 103, 0.6)'),
+        borderColor: SD.map(v => v > 0 ? '#e2624c' : '#43c267'),
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#d4dbe2', font: { size: 12 } } },
+    },
+    scales: {
+      x: { ticks: baseTick, grid: baseGrid },
+      y: { title: { display: true, text: 'sudden disconnect count', color: '#d4dbe2' },
+            min: 0, max: 5, ticks: { ...baseTick, stepSize: 1 }, grid: baseGrid },
+    },
+  },
+});
+
+new Chart(document.getElementById('latChart'), {
+  type: 'bar',
+  data: {
+    labels: iters.map(i => 'iter ' + i),
+    datasets: [
+      {
+        label: 'connect latency (ms)',
+        data: LAT,
+        backgroundColor: 'rgba(224, 179, 65, 0.6)',
+        borderColor: '#e0b341',
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#d4dbe2', font: { size: 12 } } },
+    },
+    scales: {
+      x: { ticks: baseTick, grid: baseGrid },
+      y: { title: { display: true, text: 'connect latency, ms', color: '#d4dbe2' },
+            min: 0, ticks: baseTick, grid: baseGrid },
+    },
+  },
+});
+</script>
+</body>
+</html>
