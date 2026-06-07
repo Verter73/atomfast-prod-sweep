@@ -375,9 +375,35 @@
   </div>
   <div class="chart-wrap" style="height:400px"><canvas id="mtbfChart"></canvas></div>
 
+  <h3>T<sub>recover</sub> — среднее время реконнекта</h3>
+  <div class="panel" style="padding-bottom:10px;">
+    <p style="margin-top:0;font-size:12px;color:var(--muted);">
+      <b>T<sub>recover</sub> = Σt<sub>reconnect</sub> / N<sub>success</sub></b> — среднее время от разрыва до восстановления (сек), только успешные реконнекты.
+      Только итерации с N<sub>sudden</sub> &gt; 0.
+    </p>
+  </div>
+  <div class="chart-wrap" style="height:380px"><canvas id="tRecoverChart"></canvas></div>
+
+  <h3>P<sub>success</sub> — вероятность успешного восстановления</h3>
+  <div class="panel" style="padding-bottom:10px;">
+    <p style="margin-top:0;font-size:12px;color:var(--muted);">
+      <b>P<sub>success</sub> = N<sub>success</sub> / N<sub>attempts</sub></b>.
+      1.0 = каждый разрыв восстановлен. Только итерации с N<sub>sudden</sub> &gt; 0.
+    </p>
+  </div>
+  <div class="chart-wrap" style="height:380px"><canvas id="pSuccessChart"></canvas></div>
+
+  <h3>Score = T<sub>recover</sub> / P<sub>success</sub> — целевая функция (минимизировать)</h3>
+  <div class="panel" style="padding-bottom:10px;">
+    <p style="margin-top:0;font-size:12px;color:var(--muted);">
+      Объединённый показатель: быстрый и надёжный реконнект → Score мал. Только итерации с обоими значениями.
+    </p>
+  </div>
+  <div class="chart-wrap" style="height:380px"><canvas id="scoreChart"></canvas></div>
+
   <div class="footer">
     AtomFast retry_delay production sweep — 6/21 points.
-    Обновлено 07-06-2026 20:19 UTC.
+    Обновлено 07-06-2026 20:22 UTC.
   </div>
 
 </div>
@@ -482,5 +508,42 @@ const MTBF_AVG_MED = [{"rd": 500, "avg": 11.79, "med": 12.440000000000001}, {"rd
     }
   });
 })();
+const RECOVERY = {"500": {"p": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "t": [7.9, 5.7, 18.1, 13.6, 13.5, 9.0, 6.8, 2.3], "s": [7.9, 5.7, 18.1, 13.6, 13.5, 9.0, 6.8, 2.3]}, "600": {"p": [1.0, 1.0, 1.0, 1.0], "t": [2.3, 9.1, 9.1, 13.5], "s": [2.3, 9.1, 9.1, 13.5]}, "700": {"p": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75], "t": [7.2, 5.1, 6.8, 5.3, 7.9, 13.5, 11.3, 8.0, 3.1], "s": [7.2, 5.1, 6.8, 5.3, 7.9, 13.5, 11.3, 8.0, 4.1]}, "800": {"p": [1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.667, 1.0], "t": [2.3, 11.2, 7.1, 5.7, 6.1, 5.1, 4.3, 17.9, 6.4], "s": [2.3, 11.2, 7.1, 5.7, 6.1, 5.1, 4.3, 26.8, 6.4]}, "900": {"p": [1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "t": [10.4, 2.3, 2.3, 6.8, 12.5, 8.8, 2.3, 2.3, 6.8], "s": [10.4, 2.3, 2.3, 6.8, 12.5, 8.8, 2.3, 2.3, 6.8]}, "1000": {"p": [1.0, 1.0, 1.0, 1.0, 0.941, 1.0, 1.0, 1.0, 1.0, 1.0], "t": [7.9, 3.4, 4.0, 3.8, 5.0, 5.5, 6.5, 5.8, 5.5, 7.8], "s": [7.9, 3.4, 4.0, 3.8, 5.3, 5.5, 6.5, 5.8, 5.5, 7.8]}};
+const REC_AM   = [{"rd": 500, "p_avg": 1.0, "p_med": 1.0, "t_avg": 9.61, "t_med": 8.45, "s_avg": 9.61, "s_med": 8.45}, {"rd": 600, "p_avg": 1.0, "p_med": 1.0, "t_avg": 8.5, "t_med": 9.1, "s_avg": 8.5, "s_med": 9.1}, {"rd": 700, "p_avg": 0.97, "p_med": 1.0, "t_avg": 7.58, "t_med": 7.2, "s_avg": 7.69, "s_med": 7.2}, {"rd": 800, "p_avg": 0.87, "p_med": 1.0, "t_avg": 7.34, "t_med": 6.1, "s_avg": 8.33, "s_med": 6.1}, {"rd": 900, "p_avg": 0.9, "p_med": 1.0, "t_avg": 6.06, "t_med": 6.8, "s_avg": 6.06, "s_med": 6.8}, {"rd": 1000, "p_avg": 0.99, "p_med": 1.0, "t_avg": 5.52, "t_med": 5.5, "s_avg": 5.55, "s_med": 5.5}];
+function recScatter(key){
+  const pts=[];
+  for(const rd of RD) for(const v of (RECOVERY[String(rd)]||{})[key]||[]) pts.push({x:rd,y:v});
+  return pts;
+}
+function recLine(key_avg,key_med,use_avg){
+  return REC_AM.filter(p=>p[use_avg?key_avg:key_med]!=null)
+               .map(p=>({x:p.rd,y:use_avg?p[key_avg]:p[key_med]}));
+}
+function recChart(canvasId, scatterKey, avgKey, medKey, yLabel, yMin, yMax, colour){
+  const pts=recScatter(scatterKey);
+  if(!pts.length) return;
+  const axMax = yMax || Math.ceil(Math.max(...pts.map(p=>p.y))*1.15);
+  new Chart(document.getElementById(canvasId),{
+    type:'scatter',
+    data:{ datasets:[
+      {label:'итерация',data:pts,backgroundColor:colour+'99',borderColor:colour,pointRadius:4,pointHoverRadius:6},
+      {type:'line',label:'avg',data:recLine(avgKey,medKey,true),borderColor:'#e0b341',pointRadius:4,borderWidth:2,tension:0.2,fill:false},
+      {type:'line',label:'median',data:recLine(avgKey,medKey,false),borderColor:'#43c267',pointRadius:4,borderWidth:2,tension:0.2,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:'#d4dbe2',usePointStyle:true}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: rd=${c.parsed.x}ms, ${yLabel}=${c.parsed.y}`}}
+      },
+      scales:{
+        x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,afterBuildTicks:rdTicks,ticks:t,grid:g},
+        y:{title:{display:true,text:yLabel,color:'#d4dbe2'},min:yMin,max:axMax,ticks:t,grid:g}
+      }
+    }
+  });
+}
+recChart('tRecoverChart','t','t_avg','t_med','T_recover, с', 0, null, '#4ea8de');
+recChart('pSuccessChart','p','p_avg','p_med','P_success',    0, 1.05, '#e0b341');
+recChart('scoreChart',   's','s_avg','s_med','Score, с',    0, null, '#e2624c');
 </script>
 </body></html>
