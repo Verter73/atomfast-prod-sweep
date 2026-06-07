@@ -406,7 +406,7 @@
 
   <div class="footer">
     AtomFast retry_delay production sweep — 6/21 points.
-    Обновлено 07-06-2026 20:39 UTC.
+    Обновлено 07-06-2026 20:40 UTC.
   </div>
 
 </div>
@@ -438,8 +438,8 @@ new Chart(document.getElementById('rpmChart'),{
 new Chart(document.getElementById('latChart'),{
   type:'scatter', data:{ datasets:[
     {label:'iter',data:scatter(LAT),backgroundColor:'rgba(224,179,65,0.55)',borderColor:'#e0b341',pointRadius:5},
-    {type:'line',label:'avg',data:aline(LAT),borderColor:'#e0b341',pointRadius:4,borderWidth:2,tension:0.2,fill:false,borderDash:[4,3]},
-    {type:'line',label:'median',data:mline(LAT),borderColor:'#4ea8de',pointRadius:4,borderWidth:2,tension:0.2,fill:false},
+    {type:'line',label:'avg',data:aline(LAT),borderColor:'#ff9966',pointRadius:4,borderWidth:2.5,tension:0.2,fill:false},
+    {type:'line',label:'median',data:mline(LAT),borderColor:'#4ea8de',pointRadius:4,borderWidth:2.5,tension:0.2,fill:false},
   ]},
   options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{labels:{color:'#d4dbe2'}}, tooltip:{callbacks:{label:c=>`rd=${c.parsed.x}, lat=${c.parsed.y}ms`}} },
