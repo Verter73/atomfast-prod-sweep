@@ -377,7 +377,7 @@
 
   <div class="footer">
     AtomFast retry_delay production sweep — 6/21 points.
-    Обновлено 07-06-2026 20:02 UTC.
+    Обновлено 07-06-2026 20:08 UTC.
   </div>
 
 </div>
@@ -389,6 +389,7 @@ function median(a){ const s=[...a].sort((a,b)=>a-b),m=Math.floor(s.length/2); re
 function scatter(d){ const o=[]; for(const rd of RD) for(const v of d[String(rd)]) o.push({x:rd,y:v}); return o; }
 function mline(d){ return RD.map(rd=>({x:rd,y:median(d[String(rd)])})); }
 const g={color:'rgba(138,160,184,0.12)'}, t={color:'#8aa0b8',font:{family:'Consolas,monospace',size:11}};
+const rdTicks = axis => { axis.ticks = RD.map(v=>({value:v})); };
 new Chart(document.getElementById('rpmChart'),{
   type:'scatter', data:{ datasets:[
     {label:'iter',data:scatter(RPM),backgroundColor:'rgba(78,168,222,0.55)',borderColor:'#4ea8de',pointRadius:5},
@@ -398,7 +399,7 @@ new Chart(document.getElementById('rpmChart'),{
   ]},
   options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{labels:{color:'#d4dbe2'}}, tooltip:{callbacks:{label:c=>`rd=${c.parsed.x}, rpm=${c.parsed.y.toFixed(2)}`}} },
-    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
+    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,afterBuildTicks:rdTicks,ticks:t,grid:g},
       y:{title:{display:true,text:'rec/min',color:'#d4dbe2'},min:0,max:32,ticks:t,grid:g} }
   }
 });
@@ -409,7 +410,7 @@ new Chart(document.getElementById('latChart'),{
   ]},
   options:{ responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{labels:{color:'#d4dbe2'}}, tooltip:{callbacks:{label:c=>`rd=${c.parsed.x}, lat=${c.parsed.y}ms`}} },
-    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
+    scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,afterBuildTicks:rdTicks,ticks:t,grid:g},
       y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,max:39432,ticks:t,grid:g} }
   }
 });
@@ -436,7 +437,7 @@ new Chart(document.getElementById('latAvgMedChart'),{
     },
     scales:{
       x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},
-         min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
+         min:450,max:1050,afterBuildTicks:rdTicks,ticks:t,grid:g},
       y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,ticks:t,grid:g}
     }
   }
