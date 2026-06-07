@@ -362,6 +362,9 @@
   <h3>latency подключения от retry_delay</h3>
   <div class="chart-wrap"><canvas id="latChart"></canvas></div>
 
+  <h3>latency — среднее и медиана по retry_delay</h3>
+  <div class="chart-wrap"><canvas id="latAvgMedChart"></canvas></div>
+
   <h3>Подключения vs. откл. по итерациям</h3>
   <div class="panel" style="padding-bottom:10px;">
     <p style="margin-top:0;font-size:12px;color:var(--muted);">
@@ -374,7 +377,7 @@
 
   <div class="footer">
     AtomFast retry_delay production sweep — 6/21 points.
-    Обновлено 07-06-2026 20:01 UTC.
+    Обновлено 07-06-2026 20:02 UTC.
   </div>
 
 </div>
@@ -408,6 +411,34 @@ new Chart(document.getElementById('latChart'),{
     plugins:{ legend:{labels:{color:'#d4dbe2'}}, tooltip:{callbacks:{label:c=>`rd=${c.parsed.x}, lat=${c.parsed.y}ms`}} },
     scales:{ x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
       y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,max:39432,ticks:t,grid:g} }
+  }
+});
+new Chart(document.getElementById('latAvgMedChart'),{
+  type:'line',
+  data:{ datasets:[
+    {
+      label:'avg latency',
+      data: RD.map(rd=>({x:rd, y: LAT[String(rd)].reduce((a,b)=>a+b,0)/LAT[String(rd)].length | 0 })),
+      borderColor:'#e0b341', backgroundColor:'rgba(224,179,65,0.12)',
+      pointRadius:5, pointHoverRadius:7, tension:0.25, fill:false,
+    },
+    {
+      label:'median latency',
+      data: RD.map(rd=>({x:rd, y:median(LAT[String(rd)]) })),
+      borderColor:'#4ea8de', backgroundColor:'rgba(78,168,222,0.12)',
+      pointRadius:5, pointHoverRadius:7, tension:0.25, fill:false,
+    },
+  ]},
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:'#d4dbe2',usePointStyle:true}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: rd=${c.parsed.x}ms → ${c.parsed.y}ms`}}
+    },
+    scales:{
+      x:{type:'linear',title:{display:true,text:'retry_delay, ms',color:'#d4dbe2'},
+         min:450,max:1050,ticks:{...t,stepSize:100},grid:g},
+      y:{title:{display:true,text:'connect latency, ms',color:'#d4dbe2'},min:0,ticks:t,grid:g}
+    }
   }
 });
 const CONN_DISC_AVG = [{"rd": 500, "x": 2.3, "y": 2.3}, {"rd": 600, "x": 1.5, "y": 1.5}, {"rd": 700, "x": 4.4, "y": 4.3}, {"rd": 800, "x": 9.9, "y": 9.6}, {"rd": 900, "x": 5.3, "y": 5.1}, {"rd": 1000, "x": 14.3, "y": 14.2}];
