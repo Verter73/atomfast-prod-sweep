@@ -505,47 +505,82 @@
   
     <h2 id="rssi">Мощность BLE-сигнала (RSSI) — периодический замер</h2>
     <div class="panel">
-      <p style="margin-top:0;" class="note">Среднее за 60 с, замер каждый час во время sweep'а.</p>
+      <p style="margin-top:0;" class="note">Среднее за 60 с, замер каждый час. Вертикальные метки — начало теста retry_delay.</p>
       <table>
         <thead><tr>
-          <th>Дата</th><th>Время</th><th>retry_delay</th><th>avg, дБм</th><th>min</th><th>max</th><th>n samples</th>
+          <th>Дата</th><th>Время (UTC)</th><th>retry_delay</th><th>avg, дБм</th><th>min</th><th>max</th><th>n samples</th>
         </tr></thead>
         <tbody><tr><td>07-06-2026</td><td>11:22</td><td>800</td><td><b>-87.0</b></td><td>-89</td><td>-84</td><td>24</td></tr><tr><td>07-06-2026</td><td>18:08</td><td>1000</td><td><b>-92.0</b></td><td>-96</td><td>-88</td><td>31</td></tr><tr><td>08-06-2026</td><td>04:16</td><td>1400</td><td><b>-83.9</b></td><td>-85</td><td>-83</td><td>30</td></tr><tr><td>08-06-2026</td><td>06:56</td><td>1500</td><td><b>-84.2</b></td><td>-85</td><td>-83</td><td>18</td></tr></tbody>
       </table>
       <p class="note">Рабочий диапазон BLE: −50 (вплотную) .. −90 (граница потерь). Drift &gt;3 дБ = вероятно физическое смещение.</p>
     </div>
-    <div class="chart-wrap" style="height:380px">
+    <div class="chart-wrap" style="height:400px">
       <canvas id="rssiChart"></canvas>
     </div>
     <script>
     (function(){
       const t={color:'#8aa0b8',font:{size:11}};
       const g={color:'#2a3340'};
-      const localRdTicks = axis=>{ axis.ticks=[{"value": 500}, {"value": 600}, {"value": 700}, {"value": 800}, {"value": 900}, {"value": 1000}, {"value": 1100}, {"value": 1200}, {"value": 1300}, {"value": 1400}]; };
+      const rdStarts=[{"x": 1780788226403, "label": "500"}, {"x": 1780796999576, "label": "600"}, {"x": 1780818017108, "label": "700"}, {"x": 1780832636231, "label": "800"}, {"x": 1780841408121, "label": "900"}, {"x": 1780849502976, "label": "1000"}, {"x": 1780859248320, "label": "1100"}, {"x": 1780868467046, "label": "1200"}, {"x": 1780877842424, "label": "1300"}, {"x": 1780887628780, "label": "1400"}, {"x": 1780896494626, "label": "1500"}, {"x": 1780784218851, "label": "1600"}, {"x": 1780784418599, "label": "1700"}, {"x": 1780784609486, "label": "1800"}];
+      // Custom plugin: draw vertical rd-start lines with labels
+      const rdLinesPlugin={
+        id:'rdLines',
+        afterDraw(chart){
+          const ctx=chart.ctx, xs=chart.scales.x, ys=chart.scales.y;
+          rdStarts.forEach(s=>{
+            const px=xs.getPixelForValue(s.x);
+            if(px<xs.left||px>xs.right) return;
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle='rgba(78,168,222,0.35)';
+            ctx.lineWidth=1; ctx.setLineDash([3,4]);
+            ctx.moveTo(px,ys.top); ctx.lineTo(px,ys.bottom); ctx.stroke();
+            ctx.fillStyle='#4ea8de'; ctx.font='bold 10px monospace';
+            ctx.textAlign='center';
+            ctx.fillText(s.label,px,ys.top-4);
+            ctx.restore();
+          });
+        }
+      };
+      function fmtMs(v){
+        const d=new Date(v);
+        const hh=d.getUTCHours().toString().padStart(2,'0');
+        const mm=d.getUTCMinutes().toString().padStart(2,'0');
+        const DD=d.getUTCDate().toString().padStart(2,'0');
+        const MM=(d.getUTCMonth()+1).toString().padStart(2,'0');
+        return hh+':'+mm+' '+DD+'.'+MM;
+      }
       new Chart(document.getElementById('rssiChart'),{
+        plugins:[rdLinesPlugin],
         type:'scatter',
         data:{datasets:[
-          {label:'avg RSSI, дБм',data:[{"x": 800, "y": -87.0}, {"x": 1000, "y": -92.0}, {"x": 1400, "y": -83.9}, {"x": 1500, "y": -84.2}],borderColor:'#4ea8de',backgroundColor:'rgba(78,168,222,0.25)',
+          {label:'avg RSSI, дБм',data:[{"x": 1780831338000, "y": -87.0}, {"x": 1780855737000, "y": -92.0}, {"x": 1780892208000, "y": -83.9}, {"x": 1780901783000, "y": -84.2}],borderColor:'#4ea8de',backgroundColor:'rgba(78,168,222,0.3)',
             showLine:true,tension:0.3,pointRadius:7,pointHoverRadius:9,borderWidth:2.5},
-          {label:'min',data:[{"x": 800, "y": -89}, {"x": 1000, "y": -96}, {"x": 1400, "y": -85}, {"x": 1500, "y": -85}],borderColor:'#e2624c',borderDash:[4,4],
+          {label:'min',data:[{"x": 1780831338000, "y": -89}, {"x": 1780855737000, "y": -96}, {"x": 1780892208000, "y": -85}, {"x": 1780901783000, "y": -85}],borderColor:'#e2624c',borderDash:[4,4],
             showLine:true,tension:0.3,pointRadius:4,borderWidth:1.5},
-          {label:'max',data:[{"x": 800, "y": -84}, {"x": 1000, "y": -88}, {"x": 1400, "y": -83}, {"x": 1500, "y": -83}],borderColor:'#43c267',borderDash:[4,4],
+          {label:'max',data:[{"x": 1780831338000, "y": -84}, {"x": 1780855737000, "y": -88}, {"x": 1780892208000, "y": -83}, {"x": 1780901783000, "y": -83}],borderColor:'#43c267',borderDash:[4,4],
             showLine:true,tension:0.3,pointRadius:4,borderWidth:1.5},
-          {label:'−80 (норма)',data:[{x:450,y:-80},{x:1450,y:-80}],
-            borderColor:'rgba(224,179,65,0.55)',borderDash:[6,3],showLine:true,pointRadius:0,borderWidth:1},
-          {label:'−90 (граница)',data:[{x:450,y:-90},{x:1450,y:-90}],
-            borderColor:'rgba(226,98,76,0.55)',borderDash:[6,3],showLine:true,pointRadius:0,borderWidth:1},
+          {label:'−80 (норма)',data:[{x:1780782418851,y:-80},{x:1780903583000,y:-80}],
+            borderColor:'rgba(224,179,65,0.5)',borderDash:[6,3],showLine:true,pointRadius:0,borderWidth:1},
+          {label:'−90 (граница)',data:[{x:1780782418851,y:-90},{x:1780903583000,y:-90}],
+            borderColor:'rgba(226,98,76,0.5)',borderDash:[6,3],showLine:true,pointRadius:0,borderWidth:1},
         ]},
         options:{
           responsive:true, maintainAspectRatio:false,
+          layout:{padding:{top:18}},
           plugins:{
             legend:{labels:{color:'#d4dbe2',font:{size:11}}},
-            title:{display:true,text:'RSSI мощности сигнала vs retry_delay',color:'#d4dbe2',font:{size:13}}
+            title:{display:true,text:'RSSI мощности сигнала во времени (метки = начало rd-теста)',
+                    color:'#d4dbe2',font:{size:13}}
           },
           scales:{
-            x:{type:'linear',min:450,max:1450,afterBuildTicks:localRdTicks,
-               ticks:t,grid:g,title:{display:true,text:'retry_delay, ms',color:'#8aa0b8',font:{size:11}}},
-            y:{min:-105,max:-70,ticks:{...t,callback:v=>v+' дБм'},grid:g,
+            x:{type:'linear',min:1780782418851,max:1780903583000,
+               ticks:{...t,maxTicksLimit:10,callback:fmtMs},
+               grid:g,
+               title:{display:true,text:'Время UTC',color:'#8aa0b8',font:{size:11}}},
+            y:{min:-105,max:-70,
+               ticks:{...t,callback:v=>v+' дБм'},
+               grid:g,
                title:{display:true,text:'RSSI, дБм',color:'#d4dbe2',font:{size:11}}}
           }
         }
@@ -604,7 +639,7 @@
 
   <div class="footer">
     AtomFast retry_delay production sweep — 10/21 points.
-    Обновлено 08-06-2026 07:03 UTC.
+    Обновлено 08-06-2026 07:10 UTC.
   </div>
 
 </div>
