@@ -92,7 +92,7 @@
   
     <h2 id="rssi">Мощность BLE-сигнала (RSSI) — периодический замер</h2>
     <div class="panel">
-      <p style="margin-top:0;" class="note">Среднее за 60 с, замер каждые 3 часа во время sweep'а.</p>
+      <p style="margin-top:0;" class="note">Среднее за 60 с, замер каждый час во время sweep'а.</p>
       <table>
         <thead><tr>
           <th>Дата</th><th>Время</th><th>avg, дБм</th><th>min</th><th>max</th><th>n samples</th>
@@ -101,6 +101,53 @@
       </table>
       <p class="note">Рабочий диапазон BLE: −50 (вплотную) .. −90 (граница потерь). Drift &gt;3 дБ = вероятно физическое смещение.</p>
     </div>
+    <div class="chart-wrap" style="height:320px">
+      <canvas id="rssiChart"></canvas>
+    </div>
+    <script>
+    (function(){
+      const labels = ["07.06 11:22", "07.06 18:08", "08.06 04:16"];
+      const avgD   = [-87.0, -92.0, -83.9];
+      const minD   = [-89, -96, -85];
+      const maxD   = [-84, -88, -83];
+      const ticks  = {color:'#8aa0b8',font:{size:11}};
+      const grid   = {color:'#2a3340'};
+      new Chart(document.getElementById('rssiChart'),{
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            {label:'avg RSSI, дБм',data:avgD,borderColor:'#4ea8de',backgroundColor:'rgba(78,168,222,0.12)',
+              tension:0.3,pointRadius:6,pointHoverRadius:8,fill:false,borderWidth:2.5,z:10},
+            {label:'min',data:minD,borderColor:'#e2624c',borderDash:[4,4],
+              tension:0.3,pointRadius:3,fill:false,borderWidth:1.5},
+            {label:'max',data:maxD,borderColor:'#43c267',borderDash:[4,4],
+              tension:0.3,pointRadius:3,fill:false,borderWidth:1.5},
+            {label:'−80 (норма)',data:labels.map(()=>-80),borderColor:'rgba(224,179,65,0.5)',
+              borderDash:[6,3],pointRadius:0,fill:false,borderWidth:1},
+            {label:'−90 (граница)',data:labels.map(()=>-90),borderColor:'rgba(226,98,76,0.5)',
+              borderDash:[6,3],pointRadius:0,fill:false,borderWidth:1},
+          ]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{
+            legend:{labels:{color:'#d4dbe2',font:{size:11}}},
+            title:{display:true,text:'RSSI во времени (BLE: телефон ↔ дозиметр)',color:'#d4dbe2',font:{size:13}}
+          },
+          scales:{
+            x:{ticks,grid,title:{display:true,text:'Время замера (UTC)',color:'#8aa0b8',font:{size:11}}},
+            y:{
+              min:-105, max:-70,
+              ticks:{...ticks,callback:v=>v+' дБм'},
+              grid,
+              title:{display:true,text:'RSSI, дБм',color:'#d4dbe2',font:{size:11}}
+            }
+          }
+        }
+      });
+    })();
+    </script>
     
 
   
@@ -566,7 +613,7 @@
 
   <div class="footer">
     AtomFast retry_delay production sweep — 10/21 points.
-    Обновлено 08-06-2026 05:29 UTC.
+    Обновлено 08-06-2026 06:55 UTC.
   </div>
 
 </div>
